@@ -88,24 +88,22 @@ df_titanic %>% summarize(total = sum(n))
 ## TASK: Visualize counts against `Class` and `Sex`
 
 survivors <- df_titanic |>
-  filter(Survived == "Yes")
-
-survivors <- survivors |> select(-c(Age, Survived))
-
-split <- survivors |>
-  group_split(Sex)
-
-split <- split |>
-  group_by(class) |>
+  filter(Survived == "Yes") |>
+  select(-c(Age, Survived)) |>
+  group_by(Sex, Class) |>
   summarise(n = sum(n))
 
-split
+survivors
+
+ggplot(survivors, aes(x = Sex, y = n, fill = Class)) +
+  geom_col()
 
 ```
 
 **Observations**:
 
-- Write your observations here
+- Most of the men who survived were crew.
+- A large portion of 1st and 2nd class women survived, but very few 1st and 2nd class men.
 
 # Deeper Look
 
@@ -132,26 +130,48 @@ df_prop
 ### **q4** Replicate your visual from q3, but display `Prop` in place of `n`. Document your observations, and note any new/different observations you make in comparison with q3. Is there anything *fishy* in your plot?
 
 ```{r q4-task}
+
+survivors_prop <- df_prop |>
+  filter(Survived == "Yes") |>
+  select(-c(Age, Survived)) |>
+  group_by(Sex, Class) |>
+  summarise(Prop = sum(Prop, na.rm = TRUE))
+
+survivors_prop
+
+ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
+  geom_col()
+
 ```
 
 **Observations**:
 
 - Write your observations here.
+  - Women were significantly more likely to survive than men
+  - Very few crew survived
 - Is there anything *fishy* going on in your plot?
-  - (Your response here)
 
 ### **q5** Create a plot showing the group-proportion of occupants who *did* survive, along with aesthetics for `Class`, `Sex`, *and* `Age`. Document your observations below.
 
 *Hint*: Don't forget that you can use `facet_grid` to help consider additional variables!
 
 ```{r q5-task}
+survivors_prop <- df_prop |>
+  filter(Survived == "Yes") |>
+  select(-c(Survived))
+
+survivors_prop
+
+ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
+  geom_col() +
+  facet_grid(. ~ Age)
 ```
 
 **Observations**:
 
 - (Write your observations here.)
 - If you saw something *fishy* in q4 above, use your new plot to explain the fishy-ness.
-  - (Your response here)
+  - Children were very likely to survive
 
 # Notes
 
