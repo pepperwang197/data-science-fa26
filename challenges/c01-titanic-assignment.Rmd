@@ -61,7 +61,13 @@ glimpse(df_titanic)
 
 **Observations**:
 
-- (List all variables here)
+- Class (1st, 2nd, 3rd, crew)
+- Sex (male, female)
+- Age (adult, child)
+- Survived (yes, no)
+- How many people are in the group
+
+There are 32 rows total (1 for each group).
 
 ### **q2** Skim the [Wikipedia article](https://en.wikipedia.org/wiki/RMS_Titanic) on the RMS Titanic, and look for a total count of souls aboard. Compare against the total computed below. Are there any differences? Are those differences large or small? What might account for those differences?
 
@@ -76,7 +82,7 @@ df_titanic %>% summarize(total = sum(n))
 - Write your observations here
   - According to the Wikipedia page, there were 2208 passengers and crew aboard
 - Are there any differences?
-  - The data set includes 2201, which is slightly different
+  - The data set includes 2201, which is slightly different (7 off)
 - If yes, what might account for those differences?
   - Different sources having different information, inaccurate records
 
@@ -150,6 +156,7 @@ ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
   - Women were significantly more likely to survive than men
   - Very few crew survived
 - Is there anything *fishy* going on in your plot?
+  - Some of the group proportions were greater than 1.
 
 ### **q5** Create a plot showing the group-proportion of occupants who *did* survive, along with aesthetics for `Class`, `Sex`, *and* `Age`. Document your observations below.
 
@@ -171,7 +178,8 @@ ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
 
 - (Write your observations here.)
 - If you saw something *fishy* in q4 above, use your new plot to explain the fishy-ness.
-  - Children were very likely to survive
+  - Children were very likely to survive - almost all 1st and 2nd class children survived, though 3rd class children had a much lower survival rate.
+  - Separating out children and adults solved the "fishiness" - the proportions were greater than 1 because they came from combining 2 groups.
 
 # Notes
 
