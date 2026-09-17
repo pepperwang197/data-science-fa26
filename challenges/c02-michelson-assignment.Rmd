@@ -1,7 +1,7 @@
 ---
 title: "Michelson Speed-of-light Measurements"
-author: "(Your name here)"
-date: 2020-
+author: "Pepper Wang"
+date: 2026-09-17
 output: 
   github_document:
     toc: true
@@ -84,18 +84,21 @@ df_michelson %>% glimpse()
 |            1 | 15 |   299810 |
 
 ```{r q1-task}
-## TODO: Compute summaries
-df_q1 <- NA
-df_q1 %>%
-  arrange(desc(Distinctness)) %>%
+
+df_q1 <- df_michelson |>
+  group_by(Distinctness) |>
+  summarise(n = n(), "MeanVelocity" = mean(Velocity)) |>
+  arrange(desc(Distinctness)) |>
   knitr::kable()
+
+df_q1
 ```
 
 **Observations**:
 - Write your observations here!
-  - (Your response here)
+  - The `n` values all match the table, but the `MeanVelocity` values are slightly off (by around 2 km/s).
 - Why might your table differ from Michelson's?
-  - (Your response here)
+  - The values from Michelson's table may be rounded, or the data was rounded differently.
 
 The `Velocity` values in the dataset are the speed of light *in air*; Michelson
 introduced a couple of adjustments to estimate the speed of light in a vacuum.
@@ -108,7 +111,8 @@ observations in the dataset.
 
 ```{r q2-task}
 ## TODO: Adjust the data, assign to df_q2
-df_q2 <- NA
+df_q2 <- df_michelson |>
+  mutate("VelocityVacuum" = Velocity + 92)
 
 df_q2
 ```
@@ -137,13 +141,18 @@ problems uncertainty includes some amount of human judgment.[2]
 ```{r q3-task}
 ## TODO: Compare Michelson's estimate and error against the true value
 ## Your code here!
+
+error <- LIGHTSPEED_MICHELSON - LIGHTSPEED_VACUUM
+
+error
+LIGHTSPEED_PM
 ```
 
 **Observations**:
 - Is Michelson's estimate of the error (his uncertainty) greater or less than the true error?
-  - (Your response here)
+  - It is less than the true error.
 - Make a quantitative comparison between Michelson's uncertainty and his error.
-  - (Your response here)
+  - Michelson's uncertainty is about 3 times less than the true error.
 
 The following plot shows all of Michelson's data as a [control chart](https://en.wikipedia.org/wiki/Control_chart); this sort of plot is common in manufacturing, where it is used to help determine if a manufacturing process is under [statistical control](https://en.wikipedia.org/wiki/Statistical_process_control). Each dot is one of Michelson's measurements, and the grey line connects the mean taken for each day. The same plot also shows simulated data using a probability model. We'll get into statistics later in the course; for now, let's focus on understanding what real and simulated data tend to look like.
 
@@ -208,17 +217,42 @@ df_q2 %>%
 
 **Observations**:
 Similarities
-- (your responses here)
+- The horizontal lines are in the same place
+- The dots seem to be scattered about the same amount
 Differences
-- (your responses here)
+- The simulated data has more variation in daily mean later, while the real data has more variation in daily mean earlier
+- The simulated data has many pairs of points very close to each other, while the real data does not
 
 ### __q5__ You have access to a few other variables. Construct a **at least three** visualizations of `VelocityVacuum` against these other factors. Are there other patterns in the data that might help explain the difference between Michelson's estimate and `LIGHTSPEED_VACUUM`?
 
+```{r}
+df_michelson |>
+  ggplot(mapping = aes(x = Temp, y = Velocity, color = Distinctness)) +
+  geom_point()
+```
+
+This graph is a scatter plot of velocity vs temperature, with colors signifying distinctness. There were no notable patterns anywhere; there appears to be no significant correlation between velocity and temperature, and no pattern of where points with certain distinctness values tend to be.
+
+```{r}
+df_michelson |>
+  ggplot(mapping = aes(x = Velocity)) +
+  geom_histogram(bins = 30)
+```
+
+This histogram shows the distribution of different velocity values. It shows that there is a large peak between approximately 299750 and 300000, highest in the middle between 299800 and 299900, with a few outliers.
+
+```{r}
+df_michelson |>
+  ggplot(mapping = aes(x = Velocity)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~ Distinctness, nrow = 3)
+```
+
+These histograms show distribution of velocity, but separated by distinctiveness. The graph of `Distinctiveness = 2` has a much larger peak in the middle than the other two. The graph of `Distinctiveness = 3` has values that are more spread out and less concentrated in the middle. There are many more distinctiveness 2 and 3 samples than there are distinctiveness 1.
+
 **Observations**:
 
-- Make sure to record observations on your graphs!
-
-
+No definite conclusions can be drawn from these visualizations on what may have caused the difference between Michelson's estimate and `LIGHTSPEED_VACUUM` - there seem to be no patterns in temperature or distinctiveness that could have affected the measurements. 
 
 ## Bibliography
 
