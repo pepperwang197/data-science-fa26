@@ -51,6 +51,8 @@ Make a histogram of `cty` fuel economy.
 ```{r q1-task}
 ## TASK: Make a histogram of
 mpg %>%
+  ggplot(aes(cty)) +
+  geom_histogram(bins = 20)
 # TODO: Finish this code
 ```
 
@@ -119,8 +121,11 @@ Density plots are better for showing where the data tends to be located. Frequen
 Using the graphs generated in the chunks `q1-vis1` and `q1-vis2` below, answer:
 
 - Which `class` has the most vehicles?
+  - There are the most SUVs. There are also many compact and midsize.
 - Which `class` has the broadest distribution of `cty` values?
+  - Subcompact
 - Which graph---`vis1` or `vis2`---best helps you answer each question?
+  - The first question was better answered by the first graph. The second question could be answered by either of them equally.
 
 ```{r q2-vis1}
 ## NOTE: No need to modify
@@ -170,7 +175,7 @@ diamonds %>%
 ```
 
 **Observations**
-- Write your observations here!
+- There are many sharp peaks which then decrease. This is most evident at bin widths of around 0.01. They continue being visible at higher bin widths, though past 0.03, the pattern of the decrease is not as evident. Lower than 0.01, there is no new information, but the bars end up farther apart.
 
 <!-- include-exit-ticket -->
 # Exit Ticket

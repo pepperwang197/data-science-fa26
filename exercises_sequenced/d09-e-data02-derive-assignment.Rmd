@@ -37,6 +37,7 @@ filter(diamonds, cut == "Ideal")
 diamonds %>% filter(cut == "Ideal")
 ```
 
+They do the same thing, but the code looks different
 
 ## Summarizing
 
@@ -87,6 +88,9 @@ Using `summarize()` and a logical summary function, determine the number of rows
 *Hint*: We learned about checking for equality in `e-data01-isolate`.
 
 ```{r q2-task}
+df_q2 <- diamonds |>
+  summarise(n_ideal = sum(cut == "Ideal"))
+
 df_q2
 ```
 
@@ -130,7 +134,7 @@ The function `group_by()` modifies how other dplyr verbs function. Uncomment the
 
 ```{r q3-task}
 diamonds %>%
-  ## group_by(color, clarity) %>%
+  group_by(color, clarity) %>%
   summarize(price_mean = mean(price))
 ```
 
@@ -172,15 +176,24 @@ Assign the resulting tibble to `df_q4`, and assign the appropriate values to `co
 
 ```{r q4-task}
 ## TODO: Compute the `cov_depth` and `cov_diff` and assign the result to df_q4
-df_q4 <-
-  diamonds
+
+df_q4 <- diamonds |>
+  mutate(diff = depth - 100 * 2 * z / (x + y)) |>
+  filter(!is.na(diff)) |>
+  summarize(
+    cov_depth = sd(depth) / mean(depth),
+    cov_diff = sd(diff) / mean(diff)
+  )
+
 df_q4
 ```
 
 **Observations**
 
 - Comment on the relative values of `cov_depth` and `cov_diff`.
+  - They are very different - their orders of magnitude are very far apart.
 - Why is `cov_diff` so large?
+  - The depth in the data set is computed without the factor of 100 that is in our computed depth.
 
 The following test will verify that your `df_q4` is correct:
 
@@ -199,6 +212,14 @@ Compute the `price_mean = mean(price)`, `price_sd = sd(price)`, and `price_cov =
 
 ```{r q5-task}
 ## TODO: Assign result to df_q5
+df_q5 <- diamonds |>
+  group_by(cut) |>
+  summarize(
+    price_mean = mean(price),
+    price_sd = sd(price),
+    price_cov = price_sd / price_mean
+  )
+
 df_q5
 ```
 
@@ -222,7 +243,7 @@ print("Excellent!")
 ```
 
 **Observations**:
-- Write your observations here!
+- All diamond cuts seem to have similar mean and standard deviation - there doesn't seem to be any trends.
 
 <!-- include-exit-ticket -->
 # Exit Ticket
