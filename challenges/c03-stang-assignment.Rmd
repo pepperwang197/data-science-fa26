@@ -1,7 +1,7 @@
 ---
 title: "Aluminum Data"
-author: "(Your name here)"
-date: 2020-
+author: "Pepper Wang"
+date: 2026-09-24
 output:
   github_document:
     toc: true
@@ -66,8 +66,30 @@ Note that these data are not tidy! The data in this form are convenient for repo
 
 ```{r q1-task}
 ## TASK: Tidy `df_stang`
+
+df_stang
+
+df_stang_partial_tidy <- df_stang |>
+  pivot_longer(
+    names_to = c("var", "angle"),
+    names_sep = "_",
+    values_to = "value",
+    cols = c(-thick, -alloy)
+  )
+
+df_stang_partial_tidy
+
 df_stang_long <-
-  df_stang
+  df_stang_partial_tidy |>
+  pivot_wider(
+    names_from = var,
+    values_from = value
+  ) |>
+  mutate(
+    angle = as.integer(angle)
+  ) |>
+  unnest() |>
+  filter(E != -1 & nu != -1)
 
 df_stang_long
 ```
@@ -102,20 +124,20 @@ print("Very good!")
 ### __q2__ Perform a basic EDA on the aluminum data *without visualization*. Use your analysis to answer the questions under *observations* below. In addition, add your own *specific* question that you'd like to answer about the data---you'll answer it below in q3.
 
 ```{r q2-task}
-##
+
 ```
 
 **Observations**:
 
 - Is there "one true value" for the material properties of Aluminum?
-  - (Your response here)
+  - There is likely one "true value" that can be found.
 - How many aluminum alloys are in this dataset? How do you know?
-  - (Your response here)
+  - There is only one aluminum alloy in this dataset - every row of the dataset has the same value for `alloy` (al_24st).
 - What angles were tested?
-  - (Your response here)
+  - 0, 45, and 90 degrees
 - What thicknesses were tested?
-  - (Your response here)
-- (Write your own question here)
+  - 0.022, 0.032, 0.064, and 0.081 inches
+- Are there trends for how E and nu vary over different thicknesses and angles?
 
 ## Visualize
 <!-- ------------------------- -->
@@ -123,12 +145,27 @@ print("Very good!")
 ### __q3__ Create a visualization to investigate your question from q2 above. Can you find an answer to your question using the dataset? Would you need additional information to answer your question?
 
 ```{r q3-task}
-## TASK: Investigate your question from q1 here
+df_stang_partial_tidy |>
+  filter(value != -1) |>
+  ggplot(mapping = aes(x = thick, y = value, color = angle)) +
+  geom_point() +
+  facet_grid(var ~ ., scales = "free_y")
+```
+
+```{r q3-task-2}
+df_stang_partial_tidy |>
+  filter(value != -1) |>
+  ggplot(mapping = aes(x = angle, y = value, color = thick)) +
+  geom_point() +
+  facet_grid(var ~ ., scales = "free_y")
 ```
 
 **Observations**:
 
-- (Address your question from q1 here)
+- For both `E` and `nu`, the lower 3 thicknesses had similar results with no significant downward or upward trend, while the largest thickness (0.081 in) had much lower values.
+- The angles seemed to have no effect on `E` or `nu`.
+- Data points with high thickness all had low `E` values, while data points with low thickness all had high `E` values.
+  - This correlation also somewhat applies to `nu`, but not as strongly.
 
 ### __q4__ Consider the following statement:
 
@@ -148,9 +185,9 @@ df_stang_long %>%
 **Observations**:
 
 - Does this graph support or contradict the claim above?
-  - (Your response here)
+  - This graph would support it, since all the data points for the first 3 thicknesses are all clustered together and there seem to be no differences between the groups. However, all of the 0.081 thickness data points have much lower nu and E.
 - Is this evidence *conclusive* one way or another?
-  - (Your response here)
+  - The evidence is inconclusive; it gives conflicting information.
 
 # References
 <!-- -------------------------------------------------- -->
