@@ -1,7 +1,7 @@
 ---
 title: "Gapminder"
-author: "(Your name here)"
-date: 2020-
+author: "Pepper Wang"
+date: 2026-10-6
 output:
   github_document:
     toc: true
@@ -57,11 +57,18 @@ dataset?
 
 ```{r q0-task}
 ## TASK: Do your "first checks" here!
+?gapminder
+summary(gapminder)
 ```
 
 **Observations**:
-
-- Write all variable names here
+- Variables:
+  - Country
+  - Continent
+  - Year
+  - Life expectancy, in years
+  - Population
+  - GDP per capita, in USD, inflation-adjusted
 
 ### __q1__ Determine the most and least recent years in the `gapminder` dataset.
 
@@ -69,8 +76,14 @@ dataset?
 
 ```{r q1-task}
 ## TASK: Find the largest and smallest values of `year` in `gapminder`
-year_max <- NA_real_
-year_min <- NA_real_
+
+years <- gapminder |> pull(year)
+
+year_max <- max(years)
+year_min <- min(years)
+
+year_max
+year_min
 ```
 
 Use the following test to check your work.
@@ -94,28 +107,55 @@ print("Nice!")
 
 You may encounter difficulties in visualizing these data; if so document your challenges and attempt to produce the most informative visual you can.
 
-```{r q2-task}
+```{r q2-task-1}
 ## TASK: Create a visual of gdpPercap vs continent
+gapminder |>
+  filter(year == year_min) |>
+  ggplot(aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  scale_y_log10()
+```
+
+```{r q2-task-2}
+## TASK: Create a visual of gdpPercap vs continent
+gapminder |>
+  filter(year == year_min) |>
+  ggplot(aes(x = gdpPercap, fill = continent)) +
+  geom_histogram(bins = 10, position = "dodge") +
+  scale_x_log10()
+```
+
+```{r q2-task-3}
+## TASK: Create a visual of gdpPercap vs continent
+gapminder |>
+  filter(year == year_min) |>
+  ggplot(aes(x = gdpPercap, color = continent)) +
+  geom_freqpoly(bins = 10) +
+  scale_x_log10()
 ```
 
 **Observations**:
 
-- Write your observations here
+- Africa has a large number of countries with low GDP per capita. Asia is similar but less so. Europe has a wide range that is in the middle. Oceania has very few countries but they all have very similar GDP per capita. The Americas have mostly countries with low GDP per capita, with some outliers that are higher.
+- Asia has 1 country that has a GDP per capita many times higher than any other country.
 
 **Difficulties & Approaches**:
 
-- Write your challenges and your approach to solving them
+- There is one extreme outlier country in Asia with a GDP per capita that is much higher than any other country. In every plot I tried using linear scaling, the outlier caused all the rest of the data to get squished and hard to read. Using log scaling makes this much better.
 
 ### __q3__ You should have found *at least* three outliers in q2 (but possibly many more!). Identify those outliers (figure out which countries they are).
 
 ```{r q3-task}
 ## TASK: Identify the outliers from q2
+gapminder |>
+  filter(year == year_min) |>
+  arrange(desc(gdpPercap))
 ```
 
 **Observations**:
 
 - Identify the outlier countries from q2
-  - (Your response here)
+  - The largest outlier is Kuwait. The two smaller outliers are Switzerland and the United States.
 
 *Hint*: For the next task, it's helpful to know a ggplot trick we'll learn in an upcoming exercise: You can use the `data` argument inside any `geom_*` to modify the data that will be plotted *by that geom only*. For instance, you can use this trick to filter a set of points to label:
 
@@ -139,11 +179,26 @@ gapminder %>%
 
 ```{r q4-task}
 ## TASK: Create a visual of gdpPercap vs continent
+gapminder |>
+  filter(year == year_min | year == year_max) |>
+  ggplot(aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  facet_grid(cols = vars(year)) +
+  geom_point(
+    data = . %>% filter(country %in% c(
+      "Kuwait", "Switzerland", "United States"
+    )),
+    mapping = aes(color = country),
+    size = 2
+  )
 ```
 
 **Observations**:
 
 - Write your observations here
+  - Every continent had generally much higher and more varied GDP per capita in 2007 compared to 1952.
+  - Kuwait was a large outlier in 1952; in 2007, it is no longer such an extreme outlier, but it still has the highest GDP per capita in Asia.
 
 # Your Own EDA
 <!-- -------------------------------------------------- -->
@@ -153,21 +208,46 @@ Now it's your turn! We just went through guided EDA considering the GDP per capi
 ### __q5__ Create *at least* three new figures below. With each figure, try to pose new questions about the data.
 
 ```{r q5-task1}
-## TASK: Your first graph
+gapminder |>
+  filter(year == year_min | year == year_max) |>
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = as.factor(year))) +
+  geom_point() +
+  scale_x_log10()
 ```
 
-- (Your notes and observations here)
+- There seems to be a positive correlation between GDP per capita and life expectancy, though there is a lot of variation within it
+- Between 1952 and 2007, overall GDP per capita and life expectancy both increased substantially, though the variation in both of these seems to have stayed about the same
 
 ```{r q5-task2}
-## TASK: Your second graph
+
+gapminder |>
+  filter(year == year_min | year == year_max) |>
+  ggplot(aes(lifeExp, color = continent)) +
+  geom_freqpoly(bins = 18) +
+  facet_grid(rows = vars(year))
 ```
 
-- (Your notes and observations here)
+- Between 1952 and 2007, most continents' life expectancy had an overall increase
+- Specifically, Asia and the Americas were previously in the low to medium range, and they both ended up on the high end of the plot, close to Europe. 
 
 ```{r q5-task3}
-## TASK: Your third graph
+gapminder |>
+  filter(year == year_min | year == year_max) |>
+  ggplot(aes(x = continent, y = lifeExp)) +
+  geom_boxplot(aes(fill = continent)) +
+  facet_grid(cols = vars(year))
 ```
 
-- (Your notes and observations here)
+- This graph conveys similar information to the previous one, about changes in life expectancy across continents. 
 
+```{r q5-task4}
+gapminder |>
+  filter(country %in% c(
+    "Kuwait", "Switzerland", "United States"
+  )) |>
+  ggplot(aes(x = year, y = gdpPercap, color = country)) +
+  geom_line()
+```
+
+- Kuwait (the biggest GDP per capita outlier in 1952) has a GDP per capita that decreases from 1957 to 1987, until it is similar to the GDP per capita of Switzerland and the United States, then increases at about the same rate as Switzerland and the United States. 
 
