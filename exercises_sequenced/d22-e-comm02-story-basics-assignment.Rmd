@@ -147,8 +147,12 @@ diamonds %>%
 **Classify**:
 AAA, ABT, or DHY?
 
+AAA
+
 **Justify**
 Write your justification here!
+
+There is no tension - it seems like higher carat = higher price.
 
 ### __q2__ Identify the point on the narrative spectrum, and justify your answer.
 

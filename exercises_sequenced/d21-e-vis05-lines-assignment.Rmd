@@ -78,8 +78,10 @@ The following graph doesn't work as its author intended. Based on what we learne
 
 ```{r q1-task}
 ## TODO: Fix the following code
-gapminder %>%
-  filter(continent == "Asia") %>%
+gapminder |>
+  filter(continent == "Asia") |>
+  group_by(year) |>
+  summarize(lifeExp = mean(lifeExp)) |>
   ggplot(aes(year, lifeExp)) +
   geom_line()
 ```
@@ -97,7 +99,9 @@ mpg %>%
 
 **Observations**:
 - What does a line plot assume about the data?
+  - That the data has a function relation
 - How does the `mpg` dataset violate this assumption?
+  - The data is very scattered
 
 ## Smoothing data
 
@@ -153,7 +157,9 @@ economics %>%
 
 **Observations**:
 - What can you tell based on the `Raw` data?
+  - There are many periodic smaller waves in the big wave
 - What can you tell based on the `Smoothed` data?
+  - The data overall goes up, down, then up
 
 <!-- include-exit-ticket -->
 # Exit Ticket

@@ -72,12 +72,16 @@ mpg %>%
   labs(
     x = "Engine Displacement (L)",
     y = "Highway Fuel Economy (mpg)"
-  )
+  ) +
+  theme_common()
 ```
 
 **Observations**:
 
 - What changed about the graph when you added `theme_common()`?
+  - It's a square
+  - The background is white
+  - The text is bigger
 
 Calling `theme_common()`, along with settings `labs()` and making some smart choices about geoms and annotations is often all you need to make a *really high-quality graph*.
 
