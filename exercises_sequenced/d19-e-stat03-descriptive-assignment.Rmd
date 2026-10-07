@@ -86,13 +86,15 @@ Let's learn how to handle this:
 
 ```{r q1-task}
 ## TASK: Edit to drop all NAs before computing the mean
-flights %>%
+flights |>
+  drop_na() |>
   summarize(dep_delay = mean(dep_delay))
 ```
 
 **Observations**:
 
 - What is the mean departure delay time, among available values?
+  - 12.6 minutes
 
 ## Central Tendency
 <!-- ------------------------- -->
@@ -166,13 +168,24 @@ flights %>%
   head(5)
 
 ## TASK: Duplicate the code above, but sort by `median` instead
+flights %>%
+  group_by(carrier) %>%
+  summarize(
+    mean = mean(dep_delay, na.rm = TRUE),
+    median = median(dep_delay, na.rm = TRUE)
+  ) %>%
+  arrange(desc(median)) %>%
+  head(5)
 ```
 
 **Observations**:
 
 - Which carriers are at the top of both `mean` and `median` departure delay?
+  - F9, WN, and FL are both in the top 5 for both mean and median.
 - Which carriers differ in the two lists?
+  - EV and YV are only in the top 5 mean. UA and VX are only in the top 5 median.
 - What do negative values of `dep_delay` mean?
+  - A negative delay means it was early.
 
 ## Multi-modality
 <!-- ------------------------- -->
@@ -247,7 +260,8 @@ set.seed(101)
 v_test_iqr <- rnorm(n = 10)
 
 ## TASK: Compute the interquartile range
-test_iqr <- NA_real_
+test_iqr <-
+  quantile(v_test_iqr, probs = 0.75) - quantile(v_test_iqr, probs = 0.25)
 ```
 
 Use the following test to check your answer.
@@ -289,13 +303,33 @@ tibble(
 
 ```{r q4-task}
 ## TODO: Use code from q2 to compute the sd and IQR, rank as before
+flights %>%
+  group_by(carrier) %>%
+  summarize(
+    sd = sd(dep_delay, na.rm = TRUE),
+    iqr = IQR(dep_delay, na.rm = TRUE)
+  ) %>%
+  arrange(desc(sd)) %>%
+  head(5)
+
+flights %>%
+  group_by(carrier) %>%
+  summarize(
+    sd = sd(dep_delay, na.rm = TRUE),
+    iqr = IQR(dep_delay, na.rm = TRUE)
+  ) %>%
+  arrange(desc(iqr)) %>%
+  head(5)
 ```
 
 **Observations**:
 
 - Which carriers are at the top of both `sd` and `IQR` departure delay?
+  - F9, FL, YV, and EV all were in the top 5 of both.
 - Which carriers differ in the two lists?
+  - HA is only in the top 5 of the list ordered by standard deviation. 9E is only in the top 5 of the list ordered by IQR.
 - Which carrier has the biggest difference between its `sd` and `IQR`? What might this mean?
+  - HA has a high SD but very low IQR. This may mean it has many outliers or large outliers.
 
 ## Dependence
 <!-- ------------------------- -->
@@ -341,7 +375,7 @@ In the case of a *perfect linear relationships* the Pearson correlation takes th
 ### __q5__ Compute the Pearson correlation between `x, y` below. Play with the `slope` and observe the change in the correlation.
 
 ```{r ex-cor-line}
-slope <- 0.5 # Play with this value; observe the correlation
+slope <- -.3 # Play with this value; observe the correlation
 df_line <-
   tibble(x = seq(-1, +1, length.out = 50)) %>%
   mutate(y = slope * x)
@@ -358,7 +392,9 @@ df_line %>%
 **Observations**:
 
 - For what values of `slope` is the correlation positive?
+  - Positive values
 - For what values of `slope` is the correlation negative?
+- Negative values
 
 Note that this means *correlation is a measure of dependence*; it is **not** a measure of slope! It is better thought of as how *strong* the relationship between two variables is. A closer-to-zero correlation indicates a noisy relationship between variables, while a closer-to-one (in absolute value) indicates a more perfect, predictable relationship between the variables. For instance, the following code simulates data with different correlations, and facets the data based on the underlying correlation.
 
@@ -426,12 +462,17 @@ df_quad <-
 df_quad %>%
   ggplot(aes(x, y)) +
   geom_point()
+
+df_quad |> summarize(rho = cor(x, y, method = "pearson"))
+df_quad |> summarize(rho = cor(x, y, method = "spearman"))
 ```
 
 **Observations**:
 
 - What do you predict the correlations to be?
+  - I predict a low Pearson correlation and less low Spearman correlation.
 - What are the actual correlations?
+  - Both correlations were very low. 
 
 One last point about correlation: The mean is to Pearson correlation as the median is to Spearman correlation. The median and Spearman's rho are robust to outliers.
 

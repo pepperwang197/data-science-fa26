@@ -78,12 +78,17 @@ Now it's your turn!
 df_z <- tibble(z = rnorm(100))
 
 ## TODO: Compute `count_total`, `count_A`, and `fr`
+df_z |>
+  mutate(in_A = (z <= 0)) |>
+  summarize(count_total = n(), count_A = sum(in_A), fr = mean(in_A))
 ```
 
 **Observations**:
 
 - What value of `fr` did you predict?
+  - I predicted 0.5 because a normal distribution centered at 0 should have half its values below 0.
 - Did your prediction match your calculation?
+  - The result changes every time the code is run, but it is usually around 0.5.
 
 The following graph visualizes the set $A = {z | z <= 0}$ against a standard normal density.
 
@@ -136,8 +141,8 @@ map_dfr(
     tibble(
       z = rnorm(n = n_samples),
       n = n_samples
-    ) %>%
-      mutate(in_A = (z <= 0)) %>%
+    ) |>
+      mutate(in_A = (-1.96 < z & z < 1.96)) |>
       summarize(count_total = n(), count_A = sum(in_A), fr = mean(in_A))
   }
 )
@@ -146,6 +151,7 @@ map_dfr(
 **Observations**:
 
 - What value does `fr` appear to be limiting towards?
+  - 0.95
 
 Now that we know what probability is; let's connect the idea to *distributions*.
 
@@ -179,8 +185,8 @@ map_dfr(
     tibble(
       z = rnorm(n = n_samples),
       n = n_samples
-    ) %>%
-      mutate(in_A = (z <= 0)) %>%
+    ) |>
+      mutate(in_A = (z == 2)) |>
       summarize(count_total = n(), count_A = sum(in_A), fr = mean(in_A))
   }
 )
@@ -189,6 +195,7 @@ map_dfr(
 **Observations**:
 
 - What value is `fr` approaching?
+  - 0 (for every number of samples)
 
 We can also understand this phenomenon in terms of areas; the following graph visualizes the set $A = {z | z = 2}$ against a standard normal.
 

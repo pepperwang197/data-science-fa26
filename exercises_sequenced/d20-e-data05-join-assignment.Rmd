@@ -65,6 +65,7 @@ Describe what is wrong with the result of `bind_cols` above and how it happened.
 *Hint*: John Lennon played guitar in The Beatles. John McCartney is not a real person... (as far as I know).
 
 - Write your answer here
+  - The rows got mismatched to each other.
 
 ## Joining data
 
@@ -112,9 +113,11 @@ beatles3 <-
 *Hint*: You will need to use two join functions to complete this task.
 
 ```{r q2-task}
-df_q2 <-
 ## TODO: Join beatles1 and beatles2 using beatles3 to match rows
-
+df_q2 <-
+  beatles1 |>
+  left_join(beatles3, by = "name") |>
+  left_join(beatles2, by = "surname")
 df_q2
 ```
 
@@ -202,7 +205,7 @@ Complete the code below by using an appropriate join to add the airport name to 
 flights %>% 
   left_join(
     airports %>% select(faa, name),
-    ## TODO: Select the correct join keys
+    by = c("origin" = "faa")
   ) %>% 
   select(flight, dest, name, everything())
 ```

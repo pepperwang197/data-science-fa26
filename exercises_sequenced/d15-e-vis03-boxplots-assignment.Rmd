@@ -53,7 +53,9 @@ mpg %>%
 
 **Observations**
 - Which class tends to be most "middle" for `displ` values?
+  - SUV and pickup both have the approximate midpoint of `displ` values as somewhere in their box plot representations.
 - Which plot is more effective for answering the previous question?
+  - It is easiest to determine that using the box plots.
 
 ## Boxplot definition
 
@@ -98,7 +100,8 @@ Reorder `class` according to `hwy`. Pay attention to how this modifies the plot.
 
 ```{r q2-task}
 ## TASK: Edit this code to reorder `class` according to `hwy`
-mpg %>%
+mpg |>
+  mutate(class = fct_reorder(class, hwy)) |>
   ggplot(aes(x = class, y = hwy)) +
   geom_boxplot()
 ```
@@ -119,8 +122,9 @@ Use a `cut_*` verb (of your choice) to create a categorical variable out of `car
 *Hint*: Recall that we learned how to look up documentation in an earlier exercise!
 
 ```{r q1-task}
-diamonds %>%
+diamonds |>
   ## TODO: Use mutate to add the column `carat_cut`
+  mutate(carat_cut = cut_interval(x = carat, n = 10)) |>
   ggplot(aes(x = carat_cut, y = price)) +
   geom_boxplot()
 ```
@@ -128,6 +132,9 @@ diamonds %>%
 **Observations**
 - Write your observations here!
 - Make sure to distinguish between the trend in median (bar), quantiles (box edges), and whiskers (vertical lines)
+  - The first three groups (0.2 to 1.64) have a lot of outliers that are much greater than the box
+  - The 5th group (2.12 to 2.6) has a lot of outliers that are much less than the box.
+  - The higher carat groups (3.57 to 5.01) have very little variation.
 
 ## Coordinate flipping
 
@@ -149,7 +156,8 @@ The following plot has overlapping x-axis labels. Use a verb from the reading to
 ```{r q4-task}
 mpg %>%
   ggplot(aes(manufacturer, hwy)) +
-  geom_boxplot()
+  geom_boxplot() +
+  coord_flip()
 ```
 
 This is a simple---but important---trick to remember when visualizing data with many categories.

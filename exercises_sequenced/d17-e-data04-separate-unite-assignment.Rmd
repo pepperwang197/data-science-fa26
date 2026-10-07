@@ -122,8 +122,18 @@ tribble(
 
 ```{r q1-task}
 df_q1 <-
-  genes %>%
-## TODO: pivot and unite here!
+  genes |>
+  unite(
+    col = "child",
+    parent1,
+    parent2,
+    sep = "",
+    remove = FALSE
+  ) |>
+  pivot_wider(
+    names_from = parent2,
+    values_from = child
+  )
 
 df_q1
 ```
@@ -163,8 +173,21 @@ separate to tidy these data.
 
 ```{r q2-task}
 df_q2 <-
-  alloys_mod %>%
-## TODO: pivot and separate here!
+  alloys_mod |>
+  pivot_longer(
+    cols = -c(thick, rep),
+    names_to = "var",
+    values_to = "val"
+  ) |>
+  separate(
+    col = var,
+    into = c("variable", "angle"),
+    sep = -2
+  ) |>
+  pivot_wider(
+    names_from = variable,
+    values_from = val
+  )
 
 df_q2
 ```
