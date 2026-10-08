@@ -1,7 +1,7 @@
 ---
 title: "Antibiotics"
-author: "(Your name here)"
-date: 2020-
+author: "Pepper Wang"
+date: 2026-10-07
 output:
   github_document
 ---
@@ -74,8 +74,51 @@ For all five of the visuals, you must show information on *all 16 bacteria*. For
 
 In this visual you must show *all three* effectiveness values for *all 16 bacteria*. This means **it must be possible to identify each of the 16 bacteria by name.** You must also show whether or not each bacterium is Gram positive or negative.
 
+```{r theme}
+theme_common <- function() {
+  theme_minimal() %+replace%
+  theme(
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(margin = margin(4, 4, 4, 4), size = 16),
+    axis.title.y = element_text(margin = margin(4, 4, 4, 4), size = 16, angle = 90),
+
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 12),
+
+    strip.text.x = element_text(size = 12),
+    strip.text.y = element_text(size = 12),
+
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_line(color = "grey90"),
+
+    aspect.ratio = 4 / 4,
+
+    plot.margin = unit(c(t = +0, b = +0, r = +0, l = +0), "cm"),
+    plot.title = element_text(size = 18),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 16),
+    plot.caption = element_text(size = 12)
+  )
+}
+```
+
 ```{r q1.1}
 # WRITE YOUR CODE HERE
+df_antibiotics |>
+  pivot_longer(
+    cols = c(penicillin, streptomycin, neomycin),
+    names_to = "antibiotic",
+    values_to = "mic"
+  ) |>
+  ggplot(aes(x = mic, y = 0, shape = gram, color = antibiotic)) +
+  scale_shape_discrete(solid = FALSE) +
+  geom_point(size = 5) +
+  facet_wrap(bacteria ~ .) +
+  scale_x_log10() +
+  theme(axis.text.y = element_blank()) +
+  theme(axis.title.y = element_blank())
+
 ```
 
 #### Visual 2 (All variables)
@@ -86,6 +129,16 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.2}
 # WRITE YOUR CODE HERE
+df_antibiotics |>
+  pivot_longer(
+    cols = c(penicillin, streptomycin, neomycin),
+    names_to = "antibiotic",
+    values_to = "mic"
+  ) |>
+  ggplot(aes(x = mic, y = bacteria, shape = gram, color = antibiotic)) +
+  geom_point(size = 5) +
+  scale_x_log10() +
+  geom_vline(xintercept = 0.1)
 ```
 
 #### Visual 3 (Some variables)
@@ -95,7 +148,16 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.3}
-# WRITE YOUR CODE HERE
+df_antibiotics |>
+  ggplot(aes(
+    x = streptomycin,
+    y = fct_reorder(bacteria, streptomycin),
+    color = gram
+  )) +
+  geom_point(size = 5) +
+  scale_x_log10() +
+  theme_common() +
+  geom_vline(xintercept = 0.1)
 ```
 
 #### Visual 4 (Some variables)
@@ -105,7 +167,16 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.4}
-# WRITE YOUR CODE HERE
+df_antibiotics |>
+  ggplot(aes(
+    x = streptomycin,
+    y = neomycin,
+    color = gram
+  )) +
+  geom_point(size = 5) +
+  theme_common() +
+  scale_x_log10() +
+  scale_y_log10()
 ```
 
 #### Visual 5 (Some variables)
@@ -116,6 +187,18 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.5}
 # WRITE YOUR CODE HERE
+df_antibiotics |>
+  pivot_longer(
+    cols = c(penicillin, streptomycin, neomycin),
+    names_to = "antibiotic",
+    values_to = "mic"
+  ) |>
+  ggplot(aes(x = mic, color = antibiotic)) +
+  # geom_freqpoly(bins = 10) +
+  geom_density() +
+  theme_common() +
+  scale_x_log10() +
+  geom_vline(xintercept = 0.1)
 ```
 
 ### __q2__ Assess your visuals
@@ -132,11 +215,14 @@ There are **two questions** below; use your five visuals to help answer both Gui
 
 *Observations*
 - What is your response to the question above?
-  - (Write your response here)
+  - Based on their MIC values for all the different bacteria tested, neomycin had the most MIC values that were lower (less than 0.1).
+  - There are many bacteria which had similar MIC values for neomycin and streptomycin, while penicillin was often very far away from them in value.
+  - Penicillin, though effective for some bacteria, had very high MIC values (the highest of all the antibiotics) for some others (namely pseudomonas aeruginosa, mycobacterium tuberculosis, escherichia coli, and aerobacter aerogenes).
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  - Visual 2 and 5
 - Why?
-  - (Write your response here)
+  - From visual 5, it was very clear what range of MIC values each antibiotic had the most of.
+  - Visual 2 gave very specific information on all 3 antibiotics' MIC values for every individual bacterium, while also being able to easily compare values between different bacteria.
 
 #### Guiding Question 2
 
@@ -146,11 +232,11 @@ In 1974 *Diplococcus pneumoniae* was renamed *Streptococcus pneumoniae*, and in 
 
 *Observations*
 - What is your response to the question above?
-  - (Write your response here)
+  - It was possibly renamed because it is especially resistant to streptomycin. 
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  - Visual 1
 - Why?
-  - (Write your response here)
+  - Visual 1 gave very specific information on all 3 antibiotics' MIC values for every individual bacterium.
 
 
 # References
