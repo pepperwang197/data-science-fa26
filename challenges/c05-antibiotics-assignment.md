@@ -179,7 +179,9 @@ theme_common <- function() {
     plot.title = element_text(size = 18),
     plot.title.position = "plot",
     plot.subtitle = element_text(size = 16),
-    plot.caption = element_text(size = 12)
+    plot.caption = element_text(size = 12),
+
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1)
   )
 }
 ```
@@ -221,10 +223,15 @@ df_antibiotics |>
     names_to = "antibiotic",
     values_to = "mic"
   ) |>
-  ggplot(aes(x = mic, y = bacteria, shape = gram, color = antibiotic)) +
-  geom_point(size = 5) +
+  ggplot(aes(
+    x = mic,
+    y = bacteria,
+    color = antibiotic
+  )) +
+  geom_point(size = 3) +
   scale_x_log10() +
-  geom_vline(xintercept = 0.1)
+  geom_vline(xintercept = 0.1) +
+  facet_grid(gram ~ ., scales = "free_y")
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.2-1.png)<!-- -->
@@ -240,15 +247,21 @@ your other visuals.
 
 ``` r
 df_antibiotics |>
+  pivot_longer(
+    cols = c(penicillin, streptomycin, neomycin),
+    names_to = "antibiotic",
+    values_to = "mic"
+  ) |>
   ggplot(aes(
-    x = streptomycin,
-    y = fct_reorder(bacteria, streptomycin),
+    x = mic,
+    y = fct_reorder(bacteria, mic),
     color = gram
   )) +
   geom_point(size = 5) +
   scale_x_log10() +
   theme_common() +
-  geom_vline(xintercept = 0.1)
+  geom_vline(xintercept = 0.1) +
+  facet_grid(. ~ antibiotic)
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.3-1.png)<!-- -->
@@ -264,18 +277,87 @@ your other visuals.
 
 ``` r
 df_antibiotics |>
+  separate(
+    col = bacteria,
+    into = c("genus", "species"),
+    sep = " "
+  ) |>
   ggplot(aes(
     x = streptomycin,
-    y = neomycin,
-    color = gram
+    y = neomycin
   )) +
   geom_point(size = 5) +
   theme_common() +
   scale_x_log10() +
-  scale_y_log10()
+  scale_y_log10() +
+  geom_point(
+    data = . %>% filter(genus %in% c(
+      "Streptococcus", "Salmonella", "Staphylococcus", "Diplococcus"
+    )),
+    mapping = aes(color = genus),
+    size = 5
+  )
 ```
 
-![](c05-antibiotics-assignment_files/figure-gfm/q1.4-1.png)<!-- -->
+    ## Warning: Expected 2 pieces. Additional pieces discarded in 1 rows [10].
+
+![](c05-antibiotics-assignment_files/figure-gfm/q1.4.1-1.png)<!-- -->
+
+``` r
+df_antibiotics |>
+  separate(
+    col = bacteria,
+    into = c("genus", "species"),
+    sep = " "
+  ) |>
+  ggplot(aes(
+    x = streptomycin,
+    y = penicillin
+  )) +
+  geom_point(size = 5) +
+  theme_common() +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_point(
+    data = . %>% filter(genus %in% c(
+      "Streptococcus", "Salmonella", "Staphylococcus", "Diplococcus"
+    )),
+    mapping = aes(color = genus),
+    size = 5
+  )
+```
+
+    ## Warning: Expected 2 pieces. Additional pieces discarded in 1 rows [10].
+
+![](c05-antibiotics-assignment_files/figure-gfm/q1.4.2-1.png)<!-- -->
+
+``` r
+df_antibiotics |>
+  separate(
+    col = bacteria,
+    into = c("genus", "species"),
+    sep = " "
+  ) |>
+  ggplot(aes(
+    x = neomycin,
+    y = penicillin
+  )) +
+  geom_point(size = 5) +
+  theme_common() +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_point(
+    data = . %>% filter(genus %in% c(
+      "Streptococcus", "Salmonella", "Staphylococcus", "Diplococcus"
+    )),
+    mapping = aes(color = genus),
+    size = 5
+  )
+```
+
+    ## Warning: Expected 2 pieces. Additional pieces discarded in 1 rows [10].
+
+![](c05-antibiotics-assignment_files/figure-gfm/q1.4.3-1.png)<!-- -->
 
 #### Visual 5 (Some variables)
 
@@ -295,11 +377,11 @@ df_antibiotics |>
     values_to = "mic"
   ) |>
   ggplot(aes(x = mic, color = antibiotic)) +
-  # geom_freqpoly(bins = 10) +
   geom_density() +
   theme_common() +
   scale_x_log10() +
-  geom_vline(xintercept = 0.1)
+  geom_vline(xintercept = 0.1) +
+  facet_grid(. ~ gram)
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.5-1.png)<!-- -->
@@ -323,20 +405,18 @@ opportunity to think about why this is.**
 > How do the three antibiotics vary in their effectiveness against
 > bacteria of different genera and Gram stain?
 
-*Observations* - What is your response to the question above? - Based on
-their MIC values for all the different bacteria tested, neomycin had the
-most MIC values that were lower (less than 0.1). - There are many
-bacteria which had similar MIC values for neomycin and streptomycin,
-while penicillin was often very far away from them in value. -
-Penicillin, though effective for some bacteria, had very high MIC values
-(the highest of all the antibiotics) for some others (namely pseudomonas
-aeruginosa, mycobacterium tuberculosis, escherichia coli, and aerobacter
-aerogenes). - Which of your visuals above (1 through 5) is **most
-effective** at helping to answer this question? - Visual 2 and 5 -
-Why? - From visual 5, it was very clear what range of MIC values each
-antibiotic had the most of. - Visual 2 gave very specific information on
-all 3 antibiotics’ MIC values for every individual bacterium, while also
-being able to easily compare values between different bacteria.
+*Observations* - What is your response to the question above? - Neomycin
+and streptomycin seem to be very similar in their effectiveness against
+different bacteria. For gram negative bacteria, they tend to have MIC
+values in the middle of the range. For gram positive bacteria, their MIC
+values are either very low or very high. - Penicillin is very
+ineffective for gram negative bacteria (all MIC values are greater than
+0.1) and very effective for gram positive bacteria (almost all MIC
+values are below 0.1). - Which of your visuals above (1 through 5) is
+**most effective** at helping to answer this question? - Visual 3 -
+Why? - From visual 3, it was visible which bacteria a specific
+antibiotic was effective or ineffective against, and whether those
+bacteria are gram positive or negative.
 
 #### Guiding Question 2
 
@@ -347,12 +427,12 @@ and in 1984 *Streptococcus fecalis* was renamed *Enterococcus fecalis*
 > Why was *Diplococcus pneumoniae* was renamed *Streptococcus
 > pneumoniae*?
 
-*Observations* - What is your response to the question above? - It was
-possibly renamed because it is especially resistant to streptomycin. -
-Which of your visuals above (1 through 5) is **most effective** at
-helping to answer this question? - Visual 1 - Why? - Visual 1 gave very
-specific information on all 3 antibiotics’ MIC values for every
-individual bacterium.
+*Observations* - What is your response to the question above? - It is
+very similar to other Streptococcus bacteria. - Which of your visuals
+above (1 through 5) is **most effective** at helping to answer this
+question? Visual 4 - Why? - Visual 4 shows that Diplococcus pneumoniae’s
+response to antibiotics closely matches the responses of other
+Streptococcus bacteria, signifying that it is similar to them.
 
 # References
 
