@@ -357,18 +357,17 @@ outliers.
 ``` r
 df_michelson |>
   ggplot(mapping = aes(x = Velocity)) +
-  geom_histogram(bins = 30) +
+  geom_density() +
   facet_wrap(~ Distinctness, nrow = 3)
 ```
 
 ![](c02-michelson-assignment_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-These histograms show distribution of velocity, but separated by
-distinctiveness. The graph of `Distinctiveness = 2` has a much larger
-peak in the middle than the other two. The graph of
+These density plots show distribution of velocity, separated by
+distinctiveness. - The graph of `Distinctiveness = 2` has a much larger
+peak in the middle than the other two. - The graph of
 `Distinctiveness = 3` has values that are more spread out and less
-concentrated in the middle. There are many more distinctiveness 2 and 3
-samples than there are distinctiveness 1.
+concentrated in the middle.
 
 **Observations**:
 
