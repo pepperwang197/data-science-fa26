@@ -1,7 +1,7 @@
 Getting Started: Diamonds
 ================
-(Your name here)
-2020-
+Pepper Wang
+2026-10-11 (revised)
 
 - [Grading Rubric](#grading-rubric)
   - [Individual](#individual)
@@ -98,10 +98,10 @@ document your observations.
 ``` r
 ## TASK: Plot `price` vs `carat` below
 ## Your code here!
-ggplot(diamonds) +
-  geom_point(mapping=aes(
-    x = carat,
-    y = price))
+
+diamonds |>
+  ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = 0.05)
 ```
 
 ![](c00-diamonds-assignment_files/figure-gfm/q1-task-1.png)<!-- -->
@@ -118,23 +118,34 @@ ggplot(diamonds) +
 ``` r
 ## TASK: Plot `price`, `carat`, and `cut` below
 ## Your code here!
-ggplot(diamonds) +
-  geom_point(
-    mapping=aes(
-      x = carat,
-      y = price,
-      color = cut
-    ),
-    alpha=0.1
-  )
+diamonds |>
+  ggplot(aes(x = carat, y = price, color = cut)) +
+  geom_point(alpha = 0.1)
 ```
 
 ![](c00-diamonds-assignment_files/figure-gfm/q2-task-1.png)<!-- -->
 
+``` r
+diamonds |>
+  ggplot(aes(price)) +
+  geom_freqpoly(
+    aes(
+      color = cut,
+    ),
+    bins = 60
+  )
+```
+
+![](c00-diamonds-assignment_files/figure-gfm/q2-task-revised-1.png)<!-- -->
+
 **Observations**:
 
-- Most of the diamonds on the lower end of the price range are worse
-  quality.
+- The lower quality a cut is, the fewer diamonds there are of that cut -
+  for example, there are many more ideal diamonds than any other cut,
+  and there are very few fair diamonds.
+- The price distribution is about the same for all cuts - there are the
+  most diamonds under \$2000, then there are some around \$4000, then
+  there are much fewer more expensive than that.
 
 # Communication
 

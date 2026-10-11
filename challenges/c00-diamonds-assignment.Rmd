@@ -1,7 +1,7 @@
 ---
 title: "Getting Started: Diamonds"
-author: "(Your name here)"
-date: 2020-
+author: "Pepper Wang"
+date: 2026-10-11 (revised)
 output:
   github_document:
     toc: true
@@ -59,10 +59,10 @@ In this first stage, you will explore the `diamonds` dataset and document your o
 ```{r q1-task}
 ## TASK: Plot `price` vs `carat` below
 ## Your code here!
-ggplot(diamonds) +
-  geom_point(mapping=aes(
-    x = carat,
-    y = price))
+
+diamonds |>
+  ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = 0.05)
 ```
 
 **Observations**:
@@ -75,20 +75,26 @@ ggplot(diamonds) +
 ```{r q2-task}
 ## TASK: Plot `price`, `carat`, and `cut` below
 ## Your code here!
-ggplot(diamonds) +
-  geom_point(
-    mapping=aes(
-      x = carat,
-      y = price,
-      color = cut
+diamonds |>
+  ggplot(aes(x = carat, y = price, color = cut)) +
+  geom_point(alpha = 0.1)
+```
+
+```{r q2-task-revised}
+diamonds |>
+  ggplot(aes(price)) +
+  geom_freqpoly(
+    aes(
+      color = cut,
     ),
-    alpha=0.1
+    bins = 60
   )
 ```
 
 **Observations**:
 
-- Most of the diamonds on the lower end of the price range are worse quality.
+- The lower quality a cut is, the fewer diamonds there are of that cut - for example, there are many more ideal diamonds than any other cut, and there are very few fair diamonds.
+- The price distribution is about the same for all cuts - there are the most diamonds under $2000, then there are some around $4000, then there are much fewer more expensive than that.
 
 # Communication
 
