@@ -49,9 +49,9 @@ Make sure to order your data or use the `order_by` argument when using `lead` or
 ```{r q1-task}
 ## TASK: Modify the following code to color each segment based on whether the
 ##       trend is increasing or decreasing in time
-economics %>%
-
-  ggplot(aes(date, unemploy)) +
+economics |>
+  mutate(inc_dec = sign(lead(unemploy) - unemploy)) |>
+  ggplot(aes(date, unemploy, color = as_factor(inc_dec))) +
   geom_segment(aes(
     xend = lead(date, order_by = date),
     yend = lead(unemploy, order_by = date)
@@ -131,7 +131,11 @@ tribble(
 
 ```{r q2-task}
 ## TASK: Use a rank function to filter the `mpg` data
-q2 <- mpg
+mpg
+
+q2 <- mpg |>
+  mutate(rank = dense_rank(hwy)) |>
+  filter(rank <= 3)
 q2
 ```
 
