@@ -1,7 +1,7 @@
 ---
 title: "RMS Titanic"
-author: "(Your name here)"
-date: 2020-
+author: "Pepper Wang"
+date: 2026-10-11 (revised)
 output:
   github_document:
     toc: true
@@ -65,7 +65,7 @@ glimpse(df_titanic)
 - Sex (male, female)
 - Age (adult, child)
 - Survived (yes, no)
-- How many people are in the group
+- n (How many people are in the group)
 
 There are 32 rows total (1 for each group).
 
@@ -84,7 +84,8 @@ df_titanic %>% summarize(total = sum(n))
 - Are there any differences?
   - The data set includes 2201, which is slightly different (7 off)
 - If yes, what might account for those differences?
-  - Different sources having different information, inaccurate records
+  - The ship may have had stowaways that were not in the ship's official records but were recorded later
+  - There may have been some reason to obfuscate the data from the public, so it would not be known whether a certain notable person lived or not
 
 ### **q3** Create a plot showing the count of persons who *did* survive, along with aesthetics for `Class` and `Sex`. Document your observations below.
 
@@ -93,16 +94,31 @@ df_titanic %>% summarize(total = sum(n))
 ```{r q3-task}
 ## TASK: Visualize counts against `Class` and `Sex`
 
-survivors <- df_titanic |>
+df_titanic |>
   filter(Survived == "Yes") |>
   select(-c(Age, Survived)) |>
   group_by(Sex, Class) |>
-  summarise(n = sum(n))
+  summarise(n = sum(n)) |>
 
-survivors
+  ggplot(aes(x = Sex, y = n, fill = Class)) +
+  geom_col(position = "Dodge") +
+  labs(
+    title = "Count of Survivals: Combined Adults and Children"
+  )
 
-ggplot(survivors, aes(x = Sex, y = n, fill = Class)) +
-  geom_col()
+```
+
+```{r q3}
+## TASK: Visualize counts against `Class` and `Sex`
+
+df_titanic |>
+  filter(Survived == "Yes") |>
+  ggplot(aes(x = Sex, y = n, fill = Class)) +
+  geom_col(position = "Dodge") +
+  facet_grid(Age ~ .) +
+  labs(
+    title = "Count of Survivals: Separate Adults and Children"
+  )
 
 ```
 
@@ -137,16 +153,19 @@ df_prop
 
 ```{r q4-task}
 
-survivors_prop <- df_prop |>
+df_prop |>
   filter(Survived == "Yes") |>
   select(-c(Age, Survived)) |>
   group_by(Sex, Class) |>
-  summarise(Prop = sum(Prop, na.rm = TRUE))
+  summarise(Prop = sum(Prop, na.rm = TRUE)) |>
 
-survivors_prop
+  ggplot(aes(x = Sex, y = Prop, fill = Class)) +
+  geom_col(position = "Dodge") +
+  labs(
+    title = "Summed proportion of survivors, separated by class and sex"
+  )
 
-ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
-  geom_col()
+# This is a bad plot but ZDR said I should still include it
 
 ```
 
@@ -154,31 +173,41 @@ ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
 
 - Write your observations here.
   - Women were significantly more likely to survive than men
-  - Very few crew survived
+  - Female crew and 3rd class were almost equally likely to survive, while male crew had half the chance of survival as male 3rd class
 - Is there anything *fishy* going on in your plot?
   - Some of the group proportions were greater than 1.
+
+```{r q4-task-revised}
+df_prop %>%
+  filter(Survived == "Yes") |>
+  ggplot(aes(Sex, Prop, fill = Class)) +
+  geom_col(
+    position = "dodge",
+    color = "black"
+  )
+```
+
+Observations from revised plot:
+- Without the black outlines, it appears that all 1st and 2nd class men and women survived, when other information and other plots show that is not the case.
+- With the outlines, it can be seen that the adult and child data ended up overlaid on top of each other.
 
 ### **q5** Create a plot showing the group-proportion of occupants who *did* survive, along with aesthetics for `Class`, `Sex`, *and* `Age`. Document your observations below.
 
 *Hint*: Don't forget that you can use `facet_grid` to help consider additional variables!
 
 ```{r q5-task}
-survivors_prop <- df_prop |>
+df_prop |>
   filter(Survived == "Yes") |>
-  select(-c(Survived))
-
-survivors_prop
-
-ggplot(survivors_prop, aes(x = Sex, y = Prop, fill = Class)) +
-  geom_col() +
-  facet_grid(. ~ Age)
+  ggplot(aes(x = Sex, y = Prop, fill = Class)) +
+  geom_col(position = "Dodge") +
+  facet_grid(Age ~ .)
 ```
 
 **Observations**:
 
 - (Write your observations here.)
 - If you saw something *fishy* in q4 above, use your new plot to explain the fishy-ness.
-  - Children were very likely to survive - almost all 1st and 2nd class children survived, though 3rd class children had a much lower survival rate.
+  - Children were very likely to survive - all 1st and 2nd class children survived, though 3rd class children had a much lower survival rate.
   - Separating out children and adults solved the "fishiness" - the proportions were greater than 1 because they came from combining 2 groups.
 
 # Notes
