@@ -79,7 +79,12 @@ The presence of these "ghost" points provides more context; they facilitate the 
 ## comparison.
 diamonds %>%
   ggplot(aes(carat, price)) +
-  geom_point()
+  geom_point(
+    data = . %>% select(-cut),
+    color = "grey80"
+  ) +
+  geom_point() +
+  facet_wrap(~ cut)
 ```
 
 
