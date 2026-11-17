@@ -66,8 +66,8 @@ ci_lwr <- mu - 1.96 * sd / sqrt(n)
 ci_upr <- mu + 1.96 * sd / sqrt(n)
 ## TODO: Use the equations above to compute a prediction interval for the
 ##       normal distribution rnorm(mean = mu, sd = sd)
-pi_lwr <- NA_real_
-pi_upr <- NA_real_
+pi_lwr <- mu - 1.96 * sd
+pi_upr <- mu + 1.96 * sd
 ```
 
 Use the following tests to check your work.
@@ -136,8 +136,20 @@ Using the formulas above, estimate CI and PI using `diamonds_train`. Visualize t
 ```{r q2-task}
 ## TODO: Estimate CI and PI using the formulas from q1, use diamonds_train
 ##       and assign your estimates to columns ci_lwr, ci_upr, pi_lwr, pi_upr
-df_q2 <- NA
-df_q2
+
+df_q2 <- diamonds_train |>
+  summarize(
+    mu = mean(price),
+    sd = sd(price),
+    n = n()
+  ) |>
+  mutate(
+    ci_lwr = mu - 1.96 * sd / sqrt(n),
+    ci_upr = mu + 1.96 * sd / sqrt(n),
+    pi_lwr = mu - 1.96 * sd,
+    pi_upr = mu + 1.96 * sd
+  ) |>
+  select(ci_lwr, ci_upr, pi_lwr, pi_upr)
 ```
 
 Use the following code to visualize your results; answer the questions below.
@@ -167,7 +179,10 @@ df_q2 %>%
 **Observations**:
 
 - Compare the intervals against the price observations; do the intervals and observations relate to each other like you would expect?
+  - The CI is small, since it is converging on the single true value of the mean.
+  - The PI encompasses a wide range of values.
 - Are the CI and PI working correctly? How would you check this?
+  - The PI goes into negative values, which does not make sense in the real world context.
 - What *assumptions* did you make when defining your CI and PI above? Are those assumptions valid for these data?
 
 ### __q3__ Test your intervals

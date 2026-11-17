@@ -58,7 +58,8 @@ Compute the errors $\epsilon_c$ using Michelson's measurements `c_meas` and the 
 ```{r q1-task}
 ## TASK: Compute `epsilon_c`
 df_q1 <-
-  df_michelson
+  df_michelson |>
+  mutate(epsilon_c = c_meas - c_true)
 
 df_q1 %>%
   ggplot(aes(epsilon_c)) +
@@ -74,7 +75,13 @@ Estimate the mean and standard deviation of $\epsilon_c$ from `df_q1.` Is the er
 ```{r q2-task}
 ## TASK: Estimate `epsilon_mean` and `epsilon_sd` from df_q1
 df_q2 <-
-  df_q1
+  df_q1 |>
+  summarize(
+    epsilon_mean = mean(epsilon_c),
+    epsilon_sd = sd(epsilon_c)
+  )
+
+df_q2
 ```
 
 **Observations**:
@@ -107,6 +114,9 @@ Use a CLT approximation to construct a $99%$ confidence interval on the mean of 
 ```{r q3-task}
 ## TASK: Compute a 99% confidence interval on the mean of c_meas
 C <- 0.99
+alpha <- 1 - C
+
+ci_low <- df_q2 |> 
 
 ## NOTE: This checks if the CI contains c_true
 (df_q3 %>% pull(c_lo) <= c_true) & (c_true <= df_q3 %>% pull(c_hi))

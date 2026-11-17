@@ -44,6 +44,10 @@ Create your improved graph here
 
 ```{r q1-task}
 ## TODO: Create an improved version of the graph above
+mpg %>%
+  ggplot(aes(manufacturer, cty)) +
+  geom_boxplot() +
+  coord_flip()
 ```
 
 ### __q2__ Use concepts from the reading to improve the following graph. *Make sure your graph shows all the same variables*, no more and no fewer.

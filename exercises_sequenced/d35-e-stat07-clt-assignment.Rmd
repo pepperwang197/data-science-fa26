@@ -197,12 +197,14 @@ Using the CLT, approximate a $99\%$ confidence interval for the population mean 
 
 ```{r q1-task}
 ## TASK: Estimate a 99% confidence interval with the sample below
+n <- 100
+
 set.seed(101)
-z_q1 <- rnorm(n = 100, mean = 1, sd = 2)
+z_q1 <- rnorm(n = n, mean = 1, sd = 2)
 
 alpha <- 0.01
-lo_q1 <- 
-hi_q1 <- 
+lo_q1 <- mean(z_q1) - qnorm(1 - alpha / 2) * sd(z_q1) / sqrt(n)
+hi_q1 <- mean(z_q1) + qnorm(1 - alpha / 2) * sd(z_q1) / sqrt(n)
 ```
 
 Use the following tests to check your answer.

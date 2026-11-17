@@ -84,12 +84,34 @@ Based on your results, can you reject the null hypothesis **H_0** for the popula
 ## above
 df_sample
 price_threshold
+
+alpha <- 0.05
+
+df_sample %>%
+  bootstraps(., times = 1000) %>% 
+  mutate(
+    mean = map_dbl(
+      splits,
+      function(split_df) {
+        split_df %>% 
+          analysis() %>% 
+          summarize(mean = mean(price)) %>% 
+          pull(mean)
+      }
+    )
+  ) |>
+  summarize(
+    mean_lo = quantile(mean, probs = alpha / 2),
+    mean_up = quantile(mean, probs = 1 - alpha / 2)
+  )
 ```
 
 **Observations**:
 
 - Can you reject the null hypothesis **H_0**?
+  - No, because the threshold is in the confidence interval, so it remains unknown whether the true average price is above or below 1700
 - How does this affect your decision?
+  - I would decide to not buy the diamonds.
 
 ## Different Scenario, Different Hypotheses
 <!-- -------------------------------------------------- -->
@@ -125,12 +147,33 @@ Use the techniques you learned in `e-stat09-bootstrap` to estimate a 99-percent 
 ```{r q2-task}
 ## TASK: Estimate a confidence interval for the proportion of high-cut diamonds
 ## in the population. Look to `e-stat09-bootstrap` for starter code.
+
+alpha <- 0.01
+df_sample %>%
+  bootstraps(., times = 1000) %>% 
+  mutate(
+    proportion = map_dbl(
+      splits,
+      function(split_df) {
+        split_df %>% 
+          analysis() %>% 
+          summarize(proportion = mean(cut == "Premium" | cut == "Ideal")) %>% 
+          pull(proportion)
+      }
+    )
+  ) |>
+  summarize(
+    mean_lo = quantile(proportion, probs = alpha / 2),
+    mean_up = quantile(proportion, probs = 1 - alpha / 2)
+  )
 ```
 
 **Observations**:
 
 - Can you reject the null hypothesis **H_0**?
+  - Yes, because the entire confidence interval (0.51 to 0.76) is above the threshold of 0.5.
 - How does this affect your decision?
+  - The decision is to buy the diamonds.
 
 ## Closing Thoughts
 <!-- -------------------------------------------------- -->
@@ -167,13 +210,18 @@ Compute the proportion of high-cut diamonds in the population. Did you reject th
 
 ```{r q4-task}
 ## TASK: Compute the population proportion of high-cut diamonds
+df_population |>
+  summarize(proportion = mean(cut == "Premium" | cut == "Ideal"))
 ```
 
 **Observations**:
 
 - Did you reject the null hypothesis in q2?
+  - Yes
 - What is the actual truth?
+  - The proportion of premium and ideal diamonds in the population is 0.66
 - What decision did you make?
+  - The correct one
 
 When I did q2 I **did reject the null hypothesis**. It happens that this was the correct choice; the true proportion of high-cut diamonds is greater than 50-percent.
 
