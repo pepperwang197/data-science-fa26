@@ -1,7 +1,7 @@
 ---
 title: "US Income"
-author: "(Your name here)"
-date: 202X-XX-XX
+author: "Pepper Wang"
+date: 2026-17-11
 output:
   github_document:
     toc: true
@@ -50,7 +50,7 @@ library(tidyverse)
 
 ```{r q1-task}
 ## TODO: Give the filename for your copy of Table B01003
-filename_pop <- NA_character_
+filename_pop <- "data/population_data_2018.csv"
 
 ## NOTE: No need to edit
 df_pop <-
@@ -80,12 +80,12 @@ This means that for cases listed as `*****` the US Census Bureau recommends trea
 
 ```{r q2-task}
 ## TODO: Give the filename for your copy of Table S1903
-filename_income <- NA_character_
+filename_income <- "data/income.csv"
 
 ## NOTE: No need to edit
 df_income <-
   read_csv(filename_income, skip = 1)
-df_income
+df_income |> names()
 ```
 
 Use the following test to check that you downloaded the correct file:
@@ -121,7 +121,19 @@ df_q3 <-
   ) %>%
   mutate(across(contains("median"), as.numeric)) %>%
 ## TODO: Pivot the data, rename the columns
+  pivot_longer(
+    cols = -c("Geography", "Geographic Area Name"),
+    names_to = c(".value", "category"),
+    names_pattern = "(Estimate|Margin of Error).+(\\d-person families)"
+  ) |>
+  rename(
+    "geographic_area_name" = "Geographic Area Name",
+    "income_estimate" = "Estimate",
+    "income_moe" = "Margin of Error"
+  ) |>
   glimpse()
+
+df_q3
 ```
 
 Use the following tests to check your work:
@@ -151,6 +163,13 @@ $$\text{MOE} = 1.645 \times \text{SE}.$$
 ### __q4__ Convert the margin of error to standard error. Additionally, compute a 99% confidence interval on income, and normalize the standard error to `income_CV = income_SE / income_estimate`. Provide these columns with the names `income_SE, income_lo, income_hi, income_CV`.
 
 ```{r q4-task}
+df_q4 <- df_q3 |>
+  mutate(
+    income_SE = income_moe / 1.645,
+    income_CV = income_SE / income_estimate,
+    income_lo = income_estimate - qnorm(1 - (1 - 0.99) / 2) * income_SE,
+    income_hi = income_estimate + qnorm(1 - (1 - 0.99) / 2) * income_SE,
+  )
 
 df_q4
 ```
@@ -208,6 +227,13 @@ One last wrangling step: We need to join the two datasets so we can compare popu
 ```{r q5-task}
 ## TODO: Join df_q4 and df_pop by the appropriate column
 
+
+df_data <- inner_join(
+  df_q4,
+  df_pop
+) |>
+select(-c("Geographic Area Name", "Margin of Error!!Total", "...5"))
+
 df_data
 ```
 
@@ -246,13 +272,12 @@ df_data %>%
 **Observations**:
 
 - Document your observations here.
-  - (Your response here)
-  - (Your response here)
-  - ...
+  - Bigger families tend to have larger variation in household income.
+  - Nantucket has a lot of variation in all family sizes. Dukes also does, but to a lesser extent.
 - Can you confidently distinguish between household incomes in Suffolk county? Why or why not?
-  - (Your response here)
+  - No, because the confidence intervals of all household incomes have a lot of overlap and are all very similar.
 - Which counties have the widest confidence intervals?
-  - (Your response here)
+  - Nantucket and Dukes
 
 In the next task you'll investigate the relationship between population and uncertainty.
 
@@ -261,14 +286,20 @@ In the next task you'll investigate the relationship between population and unce
 *Hint*: Remember that standard error is a function of *both* variability (e.g. variance) and sample size.
 
 ```{r q7-task}
+df_data |>
+  # filter(str_detect(geographic_area_name, "Massachusetts")) %>%
+  ggplot(aes(income_SE, population_estimate)) +
+  geom_point(alpha = 0.1) +
+  scale_x_log10() +
+  scale_y_log10()
 ```
 
 **Observations**:
 
 - What *overall* trend do you see between `SE` and population? Why might this trend exist?
-  - (Your response here)
+  - There are large outliers in both `SE` and population. The data is very scattered, but there is an overall downward trend between population and SE.
 - What does this *overall* trend tell you about the relative ease of studying small vs large counties?
-  - (Your response here)
+  - Small counties seem harder to study, possibly because of smaller sample sizes.
 
 # Going Further
 <!-- ----------------------------------------------------------------------- -->
@@ -279,11 +310,22 @@ Now it's your turn! You have income data for every county in the United States: 
 
 ```{r q8-task}
 ## TODO: Pose and answer your own question about the data
+df_data |>
+  # filter(str_detect(geographic_area_name, "Washington")) %>%
+  ggplot(aes(income_SE, population_estimate)) +
+  # ggplot(aes(population_estimate)) +
+  # geom_histogram(bins = 50) +
+  geom_point(alpha = 0.1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_grid(category ~ .)
 ```
 
 **Observations**:
 
-- Document your observations here
+- Overall, `income_SE` is higher for larger family sizes.
+- Also, the larger the family size, the more variation there is in `income_SE`. This may be because there are some regions with many large families and some regions with very few.
+- `income_SE` tends to be lower for counties with larger populations.
 
 Ideas:
 
